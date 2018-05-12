@@ -2,6 +2,8 @@ import statistics
 import random
 
 
+# TODO machine that invents new properties to test
+
 def run_several_tests(f_test, g_samples, n_samples):
     """Applies test to samples and outputs iterable of results."""
     # TODO needs better name
