@@ -14,11 +14,18 @@ def compare_results(case_results, category_results):
     Averages difference between each case result and average category
     result measured by standard deviations for that particular test.
     """
-    assert len(case_results) == len(category_results)
+    # TODO use actual confidence interval forumla after figuring out how
+    # statisticians actually do this, instead of just making up my own
     deviations = []
-    for case_result, category_result in zip(case_results, category_results):
+    for test in case_results.keys():
+        category_result = category_results[test]
+        case_result = case_results[test]
         m = statistics.mean(category_result)
         sd = statistics.stdev(category_result, m)
+        # TODO fix this hack. how can i calculate a CI if my sample is all
+        # exactly the same? how unexpected would a new result be?
+        if sd == 0:
+            sd = 0.00001
         deviation = abs(m - case_result) / sd
         deviations.append(deviation)
     return statistics.mean(deviations)
@@ -41,23 +48,20 @@ def classify(case, categories, tests, verbose=False):
     # explicitly with PRECISION
     PRECISION = 10
     results = {}
-    case_results = []
+    case_results = {}
     for c in categories:
-        results[c] = []
+        results[c] = {}
     for t in tests:
         for c in categories:
             #TODO make these generators that can be run later
-            results[c].append(list(run_several_tests(t, c, n_samples=PRECISION)))
-        case_results.append(t(case))
+            results[c][t] = list(run_several_tests(t, c, n_samples=PRECISION))
+        case_results[t] = t(case)
 
     # TODO score case against category results using compare_results
     category_scores = []
     for c in categories:
-        print('case results')
-        print(case_results)
-        print('cat results ')
-        print(results[c])
-        input()
+        # TODO breaks here -- make sure data structures are
+        # consistent
         score = compare_results(case_results, results[c])
         category_scores.append(score)
     best_fit_idx = category_scores.index(min(category_scores))
@@ -99,8 +103,11 @@ def test_2(a):
         return 0
 
 def main():
+    # Here it correctly identifies 'BCDEF' as an example in the category of
+    # words that are sequentially alphabetic, as opposed to random letters.
     case = 'BCDEF'
     print(classify(case, [cat_1(), cat_2()], [test_1, test_2], verbose=True))
+    print(classify(case, [cat_1(), cat_2()], [test_1, test_2]))
 
 if __name__ == '__main__':
     main()
