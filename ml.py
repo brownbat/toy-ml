@@ -1,9 +1,11 @@
 import statistics
 import random
 
+
 def run_several_tests(f_test, g_samples, n_samples):
     """Applies test to samples and outputs iterable of results."""
     # TODO needs better name
+    # TODO if n_samples == None then ignore it
     for s, i in zip(g_samples, range(n_samples)):
         yield f_test(s)
 
@@ -30,6 +32,7 @@ def compare_results(case_results, category_results):
         deviations.append(deviation)
     return statistics.mean(deviations)
 
+
 def classify(case, categories, tests, verbose=False):
     """Estimates which category a particular case falls in.
 
@@ -53,7 +56,7 @@ def classify(case, categories, tests, verbose=False):
         results[c] = {}
     for t in tests:
         for c in categories:
-            #TODO make these generators that can be run later
+            # TODO make these generators that can be run later
             results[c][t] = list(run_several_tests(t, c, n_samples=PRECISION))
         case_results[t] = t(case)
 
@@ -68,16 +71,18 @@ def classify(case, categories, tests, verbose=False):
     if verbose:
         return category_scores
     else:
-        return best_fit_idx # Or return categories[best_fit_index] ?
+        return best_fit_idx  # Or return categories[best_fit_index] ?
+
 
 def cat_1():
     """Returns a five-character string of sequential capital letters."""
     while True:
-        c = random.randint(0,21)
+        c = random.randint(0, 21)
         s = ''
         for i in range(5):
             s += chr(ord('A') + c + i)
         yield s
+
 
 def cat_2():
     """Returns a five-character string of random capital letters."""
@@ -87,13 +92,15 @@ def cat_2():
             a = random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
             s += a
         yield s
-        
+
+
 def test_1(a):
     """Returns 1 if second letter is one higher than first."""
     if ord(a[0]) == ord(a[1]) - 1:
         return 1
     else:
         return 0
+
 
 def test_2(a):
     """Returns 1 if third letter is two higher than first."""
@@ -102,12 +109,27 @@ def test_2(a):
     else:
         return 0
 
+
+def test_3(a, normalized=True):
+    """Returns number of simple vowels."""
+    count = 0
+    for i in a:
+        if i in 'AEIOU':
+            count += 1
+    if normalized:
+        return count // len(a)
+    else:
+        return count
+
+
 def main():
     # Here it correctly identifies 'BCDEF' as an example in the category of
     # words that are sequentially alphabetic, as opposed to random letters.
     case = 'BCDEF'
-    print(classify(case, [cat_1(), cat_2()], [test_1, test_2], verbose=True))
-    print(classify(case, [cat_1(), cat_2()], [test_1, test_2]))
+    print(classify(case, [cat_1(), cat_2()], [test_1, test_2, test_3],
+          verbose=True))
+    print(classify(case, [cat_1(), cat_2()], [test_1, test_2, test_3]))
+
 
 if __name__ == '__main__':
     main()
