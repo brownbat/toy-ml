@@ -4,10 +4,11 @@ import random
 
 # TODO machine that invents new properties to test
 
-def run_several_tests(f_test, g_samples, n_samples):
+def run_several_tests(f_test, g_samples, n_samples = 1000):
     """Applies test to samples and outputs iterable of results."""
     # TODO needs better name
-    # TODO if n_samples == None then ignore it
+    # n_samples works as a cutoff for infinite generators
+    # TODO if n_samples == None then ignore it?
     for s, i in zip(g_samples, range(n_samples)):
         yield f_test(s)
 
@@ -26,10 +27,11 @@ def compare_results(case_results, category_results):
         case_result = case_results[test]
         m = statistics.mean(category_result)
         sd = statistics.stdev(category_result, m)
-        # TODO fix this hack. how can i calculate a CI if my sample is all
-        # exactly the same? how unexpected would a new result be?
+        # TODO fix this hack. how should we calculate a CI if the sample is all
+        # exactly the same? how unexpected should a new result be?
+        EPSILON = 0.001
         if sd == 0:
-            sd = 0.00001
+            sd += EPSILON
         deviation = abs(m - case_result) / sd
         deviations.append(deviation)
     return statistics.mean(deviations)
@@ -63,11 +65,9 @@ def classify(case, categories, tests, verbose=False):
             results[c][t] = list(run_several_tests(t, c, n_samples=PRECISION))
         case_results[t] = t(case)
 
-    # TODO score case against category results using compare_results
+    # score case against category results using compare_results
     category_scores = []
     for c in categories:
-        # TODO breaks here -- make sure data structures are
-        # consistent
         score = compare_results(case_results, results[c])
         category_scores.append(score)
     best_fit_idx = category_scores.index(min(category_scores))
