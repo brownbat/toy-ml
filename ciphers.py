@@ -11,7 +11,7 @@ import ml  # noqa
 PG_DIR = os.path.abspath(os.path.join(".", "corpora"))
 W_DIR = os.path.abspath(".")
 
-
+# UTILITIES for generating random text samples (SAMPLE IMPLEMENTATION below)
 def simplify(text, keep_spaces=False):
     """Strips non-letter characters and returns uppercase text."""
     return ''.join([letter.upper() if (letter in string.ascii_letters
@@ -189,31 +189,46 @@ def random_english_or_noise(length=97, english=None, noise_type=None):
 
 # SAMPLE IMPLEMENTATION
 def cat_1():
+    """Yields random English text."""
     while True:
         yield random_english_text(97)
 def cat_2():
+    """Yields random English text enciphered with Vigenere."""
     while True:
         yield random_enciphered_text(97)
 def cat_3():
+    """Yields random English text enciphered by random period transposition."""
     while True:
         yield random_skip_text(97)
 def test_1(in_string):
+    """Counts number of letter 'E'"""
     return in_string.count('E')
 def test_2(in_string):
     return in_string.count('TH')
+    """Counts number of bigraph 'TH'"""
 def test_3(in_string):
+    """Returns index of coincidence"""
     return index_of_coincidence(in_string)
-
+def test_4(in_string):
+    """How frequently does the most frequent bigraph appear"""
+    bigraph_freqs = {}
+    for idx in range(len(in_string)-1):
+        this_bigraph = in_string[idx:idx+2]
+        bigraph_freqs[this_bigraph] = bigraph_freqs.get(this_bigraph, 0)
+    count = 0
+    for bigraph in bigraph_freqs:
+        if bigraph_freqs[bigraph] > count:
+            count = bigraph_freqs[bigraph]
+    return count
 
 while True:
-    # ERROR - often classifies english as transposition
     case_eng = random_english_text(97)
     case_vig = random_enciphered_text(97)
     case_skp = random_skip_text(97)
     case = random.choice([case_eng, case_vig, case_skp])
     print(case)
     classified_idx = ml.classify(case, [cat_1(), cat_2(), cat_3()], [test_1,
-                                 test_2, test_3])
+                                 test_2, test_3, test_4])
     print("APPEARS TO BE...")
     d_categories = {0: 'ENGLISH', 1:'VIGNERE', 2:'TRANSPOSITION'}
     print(d_categories[classified_idx])

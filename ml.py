@@ -54,7 +54,7 @@ def classify(case, categories, tests, verbose=False):
     # TODO intelligently determine when to stop sampling using optimal
     # stopping theory. For now we just specify number of samples
     # explicitly with PRECISION
-    PRECISION = 10
+    PRECISION = 300
     results = {}
     case_results = {}
     for c in categories:
