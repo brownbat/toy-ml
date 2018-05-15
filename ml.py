@@ -3,6 +3,8 @@ import random
 
 
 # TODO machine that invents new properties to test
+# TODO automatically identify and cull weak tests
+# TODO learn about confidence intervals
 
 def run_several_tests(f_test, g_samples, n_samples = 1000):
     """Applies test to samples and outputs iterable of results."""
