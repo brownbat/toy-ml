@@ -73,6 +73,8 @@ class TestML(unittest.TestCase):
         case = 'BCDEF'
 
         # Positive tests
+        # Note that cat_1 and cat_2 called because they return generator
+        # objects, in contrast to 'test' which returns results
         classified_idx = ml.classify(case, [cat_1(), cat_2()], [test_1, test_2,
                                      test_3])
         assert (classified_idx == 0),\
